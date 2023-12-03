@@ -14,4 +14,21 @@ If you find SGVL useful in your research, please use the following BibTeX entry 
       primaryClass={cs.CV}
 }
 ```
+
+# Data Preparation
+
+Follow the instructions on the official [Visual Genome Website](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html) and download the images
+
+Prepare vl checklist dataset as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md  
+
+
+
 # Installation
+create a conda environment with all packages from yaml file:
+
+`conda env create -f environment.yml`
+
+clone the repository
+
+`git clone https://github.com/AlonMendelson/SGVL`
+
