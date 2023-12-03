@@ -39,9 +39,9 @@ create a data directory and download annotations
 ```
 mkdir Data
 cd Data
-wget https://drive.google.com/file/d/1uvoS4XK6lu40M-TgX_Zs7UpI4kxm97_G/view?usp=drive_link
-wget https://drive.google.com/file/d/1B_1qVpvdpHk-fwDlKorrsuW1dcWHtank/view?usp=drive_link
-wget https://drive.google.com/file/d/1bTypvDZBhZYH3Ncb8E93LR2Kd3c2lV75/view?usp=drive_link
+gdwon --fuzzy https://drive.google.com/file/d/1uvoS4XK6lu40M-TgX_Zs7UpI4kxm97_G/view?usp=drive_link
+gdwon --fuzzy https://drive.google.com/file/d/1B_1qVpvdpHk-fwDlKorrsuW1dcWHtank/view?usp=drive_link
+gdwon --fuzzy https://drive.google.com/file/d/1bTypvDZBhZYH3Ncb8E93LR2Kd3c2lV75/view?usp=drive_link
 ```
 
 
