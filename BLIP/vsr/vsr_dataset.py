@@ -16,7 +16,7 @@ class VsrDataset(Dataset):
                 j_line = json.loads(line)
                 self.data.append(j_line)
         self.blip_processor = blip_processor
-        self.images_folder = "../../../datasets/vsr/images"
+        self.images_folder = "" #FILL IN COCO IMAGES PATH
     def __len__(self):
         return len(self.data)
 
