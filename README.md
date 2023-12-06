@@ -17,15 +17,18 @@ If you find SGVL useful in your research, please use the following BibTeX entry 
 
 # Data Preparation
 If you wish to train the model:
+<br/>
 (1) Follow the instructions on the official [Visual Genome Website](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html) and download the images
+<br/>
 (2) Download the LAION 400M dataset from [LAION](https://laion.ai/)
 
 # Evaluation Datasets
-*VL-Checklist*
+## VL-Checklist
 Prepare vl checklist dataset as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md
+<br/>
 Make sure to change IMG_ROOT accordingly in all yaml files under [this directory](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/VL_CheckList/corpus/v1)
 
-*Winoground*
+## Winoground
 Fill in your HF authentication token in [this file](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/Winoground/evaluate_winoground.py)
 
 
