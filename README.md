@@ -1,4 +1,4 @@
-# Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs
+# Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs - Work In Progress
 
 This is an official pytorch implementation of the paper [Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs](https://arxiv.org/abs/2305.06343). In this repository, we provide the PyTorch code we used to train and test our proposed SGVL model.
 
@@ -16,17 +16,28 @@ If you find SGVL useful in your research, please use the following BibTeX entry 
 ```
 
 # Data Preparation
+If you wish to train the model:
+(1) Follow the instructions on the official [Visual Genome Website](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html) and download the images
+(2) Download the LAION 400M dataset from [LAION](https://laion.ai/)
 
-Follow the instructions on the official [Visual Genome Website](https://homes.cs.washington.edu/~ranjay/visualgenome/index.html) and download the images
+# Evaluation Datasets
+*VL-Checklist*
+Prepare vl checklist dataset as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md
+Make sure to change IMG_ROOT accordingly in all yaml files under [this directory](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/VL_CheckList/corpus/v1)
 
-Prepare vl checklist dataset as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md  
+*Winoground*
+Fill in your HF authentication token in [this file](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/Winoground/evaluate_winoground.py)
+
 
 
 
 # Installation
-create a conda environment with all packages from yaml file:
+create a conda environment with all packages from yaml file and activate:
 
-`conda env create -f environment.yml`
+```
+conda env create -f environment.yml
+conda activate SGVL
+```
 
 clone the repository
 
@@ -34,14 +45,13 @@ clone the repository
 git clone https://github.com/AlonMendelson/SGVL
 cd SGVL
 ```
-create a data directory and download annotations
+For training - download the data and annotations directory
 
 ```
-mkdir Data
-cd Data
-gdwon --fuzzy https://drive.google.com/file/d/1uvoS4XK6lu40M-TgX_Zs7UpI4kxm97_G/view?usp=drive_link
-gdwon --fuzzy https://drive.google.com/file/d/1B_1qVpvdpHk-fwDlKorrsuW1dcWHtank/view?usp=drive_link
-gdwon --fuzzy https://drive.google.com/file/d/1bTypvDZBhZYH3Ncb8E93LR2Kd3c2lV75/view?usp=drive_link
+gdown --fuzzy https://drive.google.com/drive/folders/1exie6ivcRb_RR1Lulcm2-Kdsky4JQgV6?usp=drive_link --folder
 ```
+download the BLIP model checkpoint
 
-
+```
+mkdir BLIP/pretrained_checkpoints
+wget https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_base.pth -P BLIP/pretrained_checkpoints
