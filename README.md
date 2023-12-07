@@ -32,7 +32,7 @@ Make sure to change IMG_ROOT accordingly in all yaml files under [this directory
 Fill in your HF authentication token in [this file](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/Winoground/evaluate_winoground.py)
 
 ## VSR
-Follow the instructions in the [VSR repository](https://github.com/cambridgeltl/visual-spatial-reasoning/tree/master/data)
+Follow the instructions in the [VSR repository](https://github.com/cambridgeltl/visual-spatial-reasoning/tree/master/data) to download the images
 <br/>
 Fill in the path to the image folder [here](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/vsr/vsr_dataset.py)
 
