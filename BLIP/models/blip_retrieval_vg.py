@@ -1,3 +1,7 @@
+import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
+import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
 from models.med import BertConfig, BertModel
 from transformers import BertTokenizer
 
@@ -6,10 +10,6 @@ from torch import nn
 import torch.nn.functional as F
 
 from models.blip import create_vit, init_tokenizer, load_checkpoint
-
-import sys
-
-#sys.path.insert(0, "/home/gamir/DER-Roei/alon/BLIP")
 
 from detr.models.matcher import HungarianMatcher
 from detr.models.detr import SetCriterion
@@ -460,11 +460,11 @@ class BLIP_Retrieval_vg(nn.Module):
 
 def blip_retrieval_vg(pretrained='',**kwargs):
     model = BLIP_Retrieval_vg(**kwargs)
-    if pretrained:
+    args = kwargs["args"]    
+    if pretrained and args.evaluate == "":
         model,msg = load_checkpoint(model,pretrained)
         print("missing keys:")
         print(msg.missing_keys)
-        args = kwargs["args"]
         with torch.no_grad():
             if args.prompts_lora != -1:
                 for b in model.visual_encoder.blocks:

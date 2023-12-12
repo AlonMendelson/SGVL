@@ -1,9 +1,9 @@
-from datasets import load_dataset
 import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
+from datasets import load_dataset
 import torch
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
-#sys.path.insert(0, "")
 from tqdm import tqdm
 import json
 
@@ -49,13 +49,6 @@ def evaluate_winoground(blip_model, blip_processor, device):
     winoground = load_dataset("facebook/winoground", use_auth_token=auth_token)["test"]
     categories_blip_scores_itm = {}
     categories_blip_scores_itm["All Dataset"] = []
-    categories_blip_scores_itm["Ambiguously Correct"] = []
-    categories_blip_scores_itm["Visually Difficult"] = []
-    categories_blip_scores_itm["Unusual Text"] = []
-    categories_blip_scores_itm["Complex Reasoning"] = []
-    categories_blip_scores_itm["Unusual Image"] = []
-    categories_blip_scores_itm["Non Minimal"] = []
-    categories_blip_scores_itm["No Tag"] = []
 
     #load tag assignments
     f = open("Winoground/tag_assignments.json")
@@ -80,9 +73,7 @@ def evaluate_winoground(blip_model, blip_processor, device):
             blip_itm_scores_c1_i1 = torch.nn.functional.softmax(output_c1_i1, dim=1)[:, 1].item()
 
         example_id = str(example["id"])
-        all_tags = tag_assignments[example_id]
-        if len(all_tags) == 0:
-            all_tags = ["No Tag"]
+        all_tags = []
         all_tags.append("All Dataset")
         sample_dict_itm = {"id" : example["id"], "c0_i0": blip_itm_scores_c0_i0, "c0_i1": blip_itm_scores_c0_i1, "c1_i0": blip_itm_scores_c1_i0, "c1_i1": blip_itm_scores_c1_i1}
         for tag in all_tags:

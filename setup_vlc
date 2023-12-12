@@ -1,0 +1,43 @@
+import yaml
+import os
+import argparse
+
+def main(args):
+
+    base_path = "BLIP/VL_CheckList/corpus/v1"
+
+    for root, dirs, files in os.walk(base_path):
+        for file in files:
+            yaml_file_path = os.path.join(root, file)
+
+            with open(yaml_file_path, 'r') as f:
+                yaml_data = yaml.safe_load(f)
+
+            if "vg" in file:
+                yaml_data['IMG_ROOT'] = args.VG
+            elif "vaw" in file:
+                yaml_data['IMG_ROOT'] = args.VG
+            elif "hake" in file:
+                yaml_data['IMG_ROOT'] = args.Hake
+            else:
+                yaml_data['IMG_ROOT'] = args.Swig
+
+            with open(yaml_file_path, 'w') as f:
+                yaml.dump(yaml_data, f, default_flow_style=False)
+
+
+if __name__ == "__main__":
+    # Create an ArgumentParser object
+    parser = argparse.ArgumentParser()
+
+    # Add the arguments
+    parser.add_argument("--VG", default="", type=str, help="path to Visual Genome data")
+    parser.add_argument("--Hake", default="",type=str, help="path to Hake data")
+    parser.add_argument("--Swig", default="",type=str, help="path to Swig data")
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+    args.Vaw = args.VG
+
+    # Call the main function with the parsed arguments
+    main(args)

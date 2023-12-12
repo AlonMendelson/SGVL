@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
+
 '''
  * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
@@ -25,8 +28,6 @@ from torch.utils.data import DataLoader
 from models.blip_retrieval_vg import blip_retrieval_vg
 import utils
 from utils import cosine_lr_schedule
-import sys
-#sys.path.insert(0, "")
 from laion_dataset import get_data
 from vg_dataset import VgDatasetText, get_vg_loader
 from Winoground.evaluate_winoground import evaluate_winoground, blip_processor
@@ -309,6 +310,15 @@ def main(args, config):
                              vit_grad_ckpt=config['vit_grad_ckpt'], vit_ckpt_layer=config['vit_ckpt_layer'], 
                              queue_size=config['queue_size'], negative_all_rank=config['negative_all_rank'], args = args)
 
+    if args.evaluate != "":
+        if os.path.isfile(args.evaluate):
+            checkpoint = torch.load(args.evaluate, map_location='cpu')
+            # loading a bare (model only) checkpoint for fine-tune or evaluation
+            sd = checkpoint["state_dict"]
+            if next(iter(sd.items()))[0].startswith('module'):
+                sd = {k[len('module.'):]: v for k, v in sd.items()}
+            model.load_state_dict(sd)
+
     if args.lora != -1:
         mark_only_lora_as_trainable(model)
     
@@ -349,15 +359,7 @@ def main(args, config):
             param.requires_grad_()
         if args.relations > 0:
             model.no_relation_row.requires_grad_()
-            if not args.unify_heads:
-                for param in model.rel_bb_head.parameters():
-                    param.requires_grad_()
-                for param in model.rel_class_head.parameters():
-                    param.requires_grad_()
 
-    for name, param in model.named_parameters():
-        if param.requires_grad:
-            print (name)
 
     model = model.to(device)   
     
@@ -374,7 +376,7 @@ def main(args, config):
             checkpoint = torch.load(args.resume, map_location='cpu')
             if 'epoch' in checkpoint:
                 # resuming a train checkpoint w/ epoch and optimizer state
-                start_epoch = 0 if args.evaluate else checkpoint["epoch"]
+                start_epoch = checkpoint["epoch"]
                 sd = checkpoint["state_dict"]
                 if not args.distributed and next(iter(sd.items()))[0].startswith('module'):
                     sd = {k[len('module.'):]: v for k, v in sd.items()}
@@ -388,23 +390,25 @@ def main(args, config):
             print("=> no checkpoint found at '{}'".format(args.resume))        
 
     #### laion Dataset ####
-    print("Creating laion dataset")
-    data = get_data(args, epoch=start_epoch)
-    train_loader = data["train"].dataloader
+    if args.evaluate == "":
+        print("Creating laion dataset")
+        data = get_data(args, epoch=start_epoch)
+        train_loader = data["train"].dataloader
 
     #### vg Dataset ####
-    vg_dataloader = None 
-    if args.vg_data:
-        print("Creating vg dataset")
-        vg_train_dataset = VgDatasetText(args.vg_data, "train", processor, args.objects, args.vg_loss_lambda, args.negatives,  args.relations)
-        vg_dataloader = get_vg_loader(vg_train_dataset, args, args.vg_batch_size)
+    vg_dataloader = None
+    if args.evaluate == "": 
+        if args.vg_data:
+            print("Creating vg dataset")
+            vg_train_dataset = VgDatasetText(args.vg_data, "train", processor, args.objects, args.vg_loss_lambda, args.negatives,  args.relations)
+            vg_dataloader = get_vg_loader(vg_train_dataset, args, args.vg_batch_size)
    
     print("Start training")
     start_time = time.time()  
     dist.barrier()  
 
     for epoch in range(start_epoch, config['max_epoch']):    
-        if not args.evaluate:        
+        if args.evaluate == "":        
             if args.distributed:
                 data["train"].set_epoch(epoch)
                 if vg_dataloader != None:
@@ -458,12 +462,9 @@ def main(args, config):
                 winoground_folder = os.path.join(args.output_dir,"winoground")
                 if not os.path.exists(winoground_folder):
                     os.mkdir(winoground_folder)
-                winoground_dict_path = os.path.join(winoground_folder,"winoground_" + str(epoch))
+                winoground_dict_path = os.path.join(winoground_folder,"winoground")
                 with open(os.path.join(winoground_dict_path), 'w',encoding='utf-8') as f:
                     json.dump(winoground_dict, f)
-                detailed_dict_path = os.path.join(winoground_folder,"winoground_detailed_" + str(epoch))
-                with open(os.path.join(detailed_dict_path), 'w',encoding='utf-8') as f:
-                    json.dump(detailed_dict, f)
 
 
             if args.vlchecklist:
@@ -479,19 +480,16 @@ def main(args, config):
             
             if args.vsr:
                 vsr_folder = os.path.join(args.output_dir,"vsr")
-                vsr_dict_path1 = os.path.join(vsr_folder,"vsr_" + str(epoch))
                 vsr_dict_path2 = os.path.join(vsr_folder,"vsr_meta_" + str(epoch))
                 results_by_cat, results_by_meta_cat = evaluate_vsr(model_without_ddp,blip_processor(config["image_size"]),device)
                 if not os.path.exists(vsr_folder):
                     os.mkdir(vsr_folder)
-                with open(os.path.join(vsr_dict_path1), 'w',encoding='utf-8') as f:
-                    json.dump(results_by_cat, f)
                 with open(os.path.join(vsr_dict_path2), 'w',encoding='utf-8') as f:
                     json.dump(results_by_meta_cat, f)
 
 
                     
-        if args.evaluate: 
+        if args.evaluate != "": 
             break
 
         dist.barrier()     
@@ -507,7 +505,7 @@ if __name__ == '__main__':
     parser.add_argument('--config', default='./configs/laion_vg.yaml')
     parser.add_argument('--output_dir', default='output')
     parser.add_argument("--name", default="test")
-    parser.add_argument('--evaluate', action='store_true')        
+    parser.add_argument('--evaluate', default = "", type=str)        
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')    
@@ -516,33 +514,34 @@ if __name__ == '__main__':
     parser.add_argument('--train-data', default = None, type=str)
     parser.add_argument('--train-num-samples', default = 0, type=int)
     parser.add_argument('--dataset-type', default = "auto", type=str)
-    parser.add_argument('--workers', default = 1, type=int)
-    parser.add_argument('--vg-data', default = "Data", type=str)
-    parser.add_argument('--vg-loss-lambda', default = 0.0, type=float)
+    parser.add_argument('--workers', default = 4, type=int)
+    parser.add_argument('--vg-data', default = "../Data", type=str)
+    parser.add_argument('--vg-loss-lambda', default = 1.0, type=float)
     parser.add_argument('--negatives-loss-lambda', default = 1.0, type=float)
     parser.add_argument('--negatives', action='store_true')
     parser.add_argument('--batch-size', default = 32, type=int)
     parser.add_argument('--vg-batch-size', default = 8, type=int)
-    parser.add_argument('--objects', default = 0, type=int)
-    parser.add_argument('--object-tokens', default = 0, type=int)
-    parser.add_argument('--relations', default = 0, type=int)
-    parser.add_argument('--relation-tokens', default = 0, type=int)
+    parser.add_argument('--objects', default = 10, type=int)
+    parser.add_argument('--object-tokens', default = 25, type=int)
+    parser.add_argument('--relations', default = 7, type=int)
+    parser.add_argument('--relation-tokens', default = 7, type=int)
     parser.add_argument('--head-layers', default = 3, type=int)
     parser.add_argument('--winoground', action='store_true')
     parser.add_argument('--vlchecklist', action='store_true')
     parser.add_argument('--checkpoint-frequency', default = 0, type=int)
     parser.add_argument('--vsr', action='store_true')
-    parser.add_argument('--lora', default = -1, type=int)
-    parser.add_argument('--text-lora', action='store_true')
-    parser.add_argument('--image-lora', action='store_true')
-    parser.add_argument('--prompts-lora', default = -1, type=int)
+    parser.add_argument('--lora', default = 16, type=int)
+    parser.add_argument('--text-lora', action='store_false')
+    parser.add_argument('--image-lora', action='store_false')
+    parser.add_argument('--prompts-lora', default = 32, type=int)
     parser.add_argument('--resume', default = None, type=str)
-    parser.add_argument('--lr', default = 0.0001, type=float)
-    parser.add_argument('--prompt-attention', action='store_true')
-    parser.add_argument('--prompt-attention-full', action='store_true')
-    parser.add_argument('--lora-cross',default = -1, type=int)
+    parser.add_argument('--lr', default = 0.00005, type=float)
+    parser.add_argument('--prompt-attention', action='store_false')
+    parser.add_argument('--prompt-attention-full', action='store_false')
+    parser.add_argument('--lora-cross',default = 32, type=int)
     parser.add_argument('--lock', action='store_true')
-    parser.add_argument('--epochs', default = 0, type=int)
+    parser.add_argument('--epochs', default = 8, type=int)
+    parser.add_argument('--stop_after', default = 6, type=int)
     parser.add_argument("--loss-ce", default = 1.0, type=float)
 
 

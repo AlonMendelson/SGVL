@@ -97,7 +97,6 @@ dependencies:
     - dill==0.3.6
     - easydict==1.10
     - einops==0.6.1
-    - en-core-web-sm==3.5.0
     - fairscale==0.4.4
     - filelock==3.9.0
     - frozenlist==1.3.3

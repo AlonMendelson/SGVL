@@ -1,12 +1,11 @@
-
 import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
+
 from PIL import Image
 import requests
 import torch
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
-#sys.path.insert(0, "/home/gamir/DER-Roei/alon/BLIP")
-from models.blip_itm import blip_itm
 from tqdm import tqdm
 import pandas as pd
 import json
@@ -61,32 +60,13 @@ def evaluate_vsr(blip_model, blip_processor, device):
             cats.append(cat)
     print (f"# rel: {rel_count}")
     cats = list(set(cats))
-
     results_by_cat = {}
-    results_by_meta_cat = {"Adjacency":{"corrects":0,"samples":0}, "Directional":{"corrects":0,"samples":0}, "Orientation":{"corrects":0,"samples":0},
-    "Projective":{"corrects":0,"samples":0},"Proximity":{"corrects":0,"samples":0},"Topological":{"corrects":0,"samples":0},"Unallocated":{"corrects":0,"samples":0}, "total":{"corrects":0,"samples":0}}
+    results_by_meta_cat = {"total":{"corrects":0,"samples":0}}
     for i in range(len(all_results)):
         result = all_results[i]
-        relation = all_relations[i]
-        if relation not in results_by_cat:
-            if result == True:
-                results_by_cat[relation] = {"corrects":1,"samples":1}
-            else:
-                results_by_cat[relation] = {"corrects":0,"samples":1}  
-        else:
-            results_by_cat[relation]["samples"] +=1
-            if result == True:
-                results_by_cat[relation]["corrects"] +=1
-        results_by_cat[relation]["accuracy"] = results_by_cat[relation]["corrects"]/results_by_cat[relation]["samples"]
-        if relation not in rel2cat:
-            continue
-        metacat = rel2cat[relation]
-        results_by_meta_cat[metacat]["samples"] +=1
         results_by_meta_cat["total"]["samples"] +=1
         if result == True:
-            results_by_meta_cat[metacat]["corrects"] += 1
             results_by_meta_cat["total"]["corrects"] += 1
-        results_by_meta_cat[metacat]["accuracy"] = results_by_meta_cat[metacat]["corrects"]/results_by_meta_cat[metacat]["samples"]
         results_by_meta_cat["total"]["accuracy"] = results_by_meta_cat["total"]["corrects"]/results_by_meta_cat["total"]["samples"]
         
     return results_by_cat, results_by_meta_cat

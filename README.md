@@ -1,4 +1,4 @@
-# Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs - Under Development
+# Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs
 
 This is an official pytorch implementation of the paper [Incorporating Structured Representations into Pretrained Vision & Language Models Using Scene Graphs](https://arxiv.org/abs/2305.06343). In this repository, we provide the PyTorch code we used to train and test our proposed SGVL model.
 
@@ -23,10 +23,14 @@ If you wish to train the model:
 (2) Download the LAION 400M dataset from [LAION](https://laion.ai/)
 
 # Evaluation Datasets
+Follow the instructions for the datasets you wish to evaluate the model on
 ## VL-Checklist
-Prepare vl checklist dataset as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md
+Prepare VL-Checklist datasets as described in https://github.com/om-ai-lab/VL-CheckList/blob/main/DATASETS.md
 <br/>
-Make sure to change IMG_ROOT accordingly in all yaml files under [this directory](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/VL_CheckList/corpus/v1)
+Run the VL-Checklist setup code
+```
+python setup_vlc --VG PATH_TO_VG --Hake PATH_TO_HAKE --Swig PATH_TO_SWIG
+```
 
 ## Winoground
 Fill in your HF authentication token in [this file](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/Winoground/evaluate_winoground.py)
@@ -34,32 +38,48 @@ Fill in your HF authentication token in [this file](https://github.com/AlonMende
 ## VSR
 Follow the instructions in the [VSR repository](https://github.com/cambridgeltl/visual-spatial-reasoning/tree/master/data) to download the images
 <br/>
-Fill in the path to the image folder [here](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/vsr/vsr_dataset.py)
+Fill in the path to the images folder [here](https://github.com/AlonMendelson/SGVL/blob/main/BLIP/vsr/vsr_dataset.py)
 
 
 
 
 # Installation
-create a conda environment with all packages from yaml file and activate:
+Create a conda environment with all packages from yaml file and activate:
 
 ```
 conda env create -f environment.yml
 conda activate SGVL
 ```
 
-clone the repository
+Clone the repository
 
 ```
 git clone https://github.com/AlonMendelson/SGVL
 cd SGVL
 ```
-For training - download the data and annotations directory
+Run the code setup file
+
+```
+python setup_code.py
+```
+#Inference
+Download the BLIP-SGVL pretrained weights from this [link](https://drive.google.com/file/d/13jzpcLgGalO3hkiqVwziNAlCEZD90ENN/view?usp=drive_link)
+
+Run the evaluation code
+```
+bash eval.sh
+```
+
+#Training
+Download the data and annotations directory
 
 ```
 gdown --fuzzy https://drive.google.com/drive/folders/1exie6ivcRb_RR1Lulcm2-Kdsky4JQgV6?usp=drive_link --folder
 ```
-download the BLIP model checkpoint
+Download the BLIP model base checkpoint
 
 ```
 mkdir BLIP/pretrained_checkpoints
 wget https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_base.pth -P BLIP/pretrained_checkpoints
+
+

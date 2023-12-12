@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, '/home/gamir/DER-Roei/alon/SGVL/BLIP')
 '''
  * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
@@ -7,8 +9,6 @@
  * Based on huggingface code base
  * https://github.com/huggingface/transformers/blob/v4.15.0/src/transformers/models/bert
 '''
-import sys
-#sys.path.insert(0, "/home/gamir/DER-Roei/alon/BLIP")
 from loralib import layers as lora_layers
 import math
 import os

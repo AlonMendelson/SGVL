@@ -112,9 +112,6 @@ class Evaluate(object):
                     #try:
                     result_pos = self.model.predict(images, texts_pos, src_type='local')
                     result_neg = self.model.predict(images, texts_neg, src_type='local')
-                    #except Exception as e:
-                    #    print(e)
-                    #    continue
                     
                     result_t1 = zip(result_pos["probs"], result_neg["probs"])
                     result_tmp = list(result_t1)
@@ -136,40 +133,11 @@ class Evaluate(object):
                 results[name] = f'acc: {round(accuracy, 4)}'
                 file_name = data_type.replace("/","_")
                 category_name = file_name.split("_")[0].lower()
-                #sample_t = random.sample(sample_true,self.sample_num)
-                #sample_f = random.sample(sample_false,self.sample_num)
                 if utils.is_main_process():
                     folder_path = os.path.join(self.cur_dir, self.args.output_dir,"vlchecklist", f'{self.epoch}')
                     os.makedirs(folder_path, exist_ok=True)
 
-                #baseline_acc = 0.0
-                #baseline_folder = "logs/clip_vl_winoground_baseline/vl-checklist/itc"
-                #baseline_json_path = os.path.join(baseline_folder,f'{file_name}_{name}_{0}.json')
-                #with open(baseline_json_path) as f:
-                #    baseline_data = json.load(f)
-                #    baseline_acc = baseline_data["total_acc"]
-
-                #self.averages[category_name]["sum"] += len(d.data[name]) * accuracy
-                #self.averages[category_name]["samples"] += len(d.data[name])
                     with open(os.path.join(folder_path, f'{file_name}_{name}.json'), 'w',
                             encoding='utf-8') as f:
-                        #json.dump({"sample_correct_outputs": sample_t, "sample_incorrect_outputs": sample_f,
-                        #           "total_acc": round(accuracy, 4), "number_of_data": len(d.data[name]),
-                        #            "task": self.task, "eval_time": endtime - starttime}, f)
                         json.dump({"total_acc": round(accuracy, 4),  "number_of_data": len(d.data[name]),
                                     "task": self.task, "eval_time": endtime - starttime}, f)
-                # for n, i in enumerate(zip(sample_t, sample_f)):
-                #     add_caption(i[0]["img_path"], 'pos_text:' + i[0]["pos_txt"], 'pos_score:' + str(i[0]["pos_score"]),
-                #                 'neg_text:' + i[0]["neg_txt"], 'neg_score:' + str(i[0]["neg_score"]), sample_path,
-                #                 f'cor-{n + 1}')
-                #     add_caption(i[1]["img_path"], 'pos_text:' + i[1]["pos_txt"], 'pos_score:' + str(i[1]["pos_score"]),
-                #                 'neg_text:' + i[1]["neg_txt"], 'neg_score:' + str(i[1]["neg_score"]), sample_path,
-                #                 f'incor-{n + 1}')
-
-        #if self.args.save_logs:
-        #    if self.tb_writer is not None:
-        #        both_res=0
-        #        for k in results.keys():
-        #            both_res += results[k]
-        #        both_res = both_res/results.keys().__len__()
-        #        self.tb_writer.add_scalar(f"val/both/{data_type}_eval", both_res, self.epoch)
