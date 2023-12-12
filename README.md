@@ -62,7 +62,7 @@ Run the code setup file
 ```
 python setup_code.py
 ```
-#Inference
+# Inference
 Download the BLIP-SGVL pretrained weights from this [link](https://drive.google.com/file/d/13jzpcLgGalO3hkiqVwziNAlCEZD90ENN/view?usp=drive_link)
 
 Run the evaluation code
@@ -70,7 +70,7 @@ Run the evaluation code
 bash eval.sh
 ```
 
-#Training
+# Training
 Download the data and annotations directory
 
 ```
