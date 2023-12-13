@@ -400,7 +400,7 @@ def main(args, config):
     if args.evaluate == "": 
         if args.vg_data:
             print("Creating vg dataset")
-            vg_train_dataset = VgDatasetText(args.vg_data, "train", processor, args.objects, args.vg_loss_lambda, args.negatives,  args.relations)
+            vg_train_dataset = VgDatasetText(args.vg_data, processor, args.objects, args.vg_loss_lambda, negatives = args.negatives,  relations = args.relations)
             vg_dataloader = get_vg_loader(vg_train_dataset, args, args.vg_batch_size)
    
     print("Start training")
@@ -489,7 +489,7 @@ def main(args, config):
 
 
                     
-        if args.evaluate != "": 
+        if args.evaluate != "" or epoch == (args.stop_after - 1): 
             break
 
         dist.barrier()     
@@ -528,7 +528,7 @@ if __name__ == '__main__':
     parser.add_argument('--head-layers', default = 3, type=int)
     parser.add_argument('--winoground', action='store_true')
     parser.add_argument('--vlchecklist', action='store_true')
-    parser.add_argument('--checkpoint-frequency', default = 0, type=int)
+    parser.add_argument('--checkpoint-frequency', default = 6, type=int)
     parser.add_argument('--vsr', action='store_true')
     parser.add_argument('--lora', default = 16, type=int)
     parser.add_argument('--text-lora', action='store_false')
@@ -541,7 +541,7 @@ if __name__ == '__main__':
     parser.add_argument('--lora-cross',default = 32, type=int)
     parser.add_argument('--lock', action='store_true')
     parser.add_argument('--epochs', default = 8, type=int)
-    parser.add_argument('--stop_after', default = 6, type=int)
+    parser.add_argument('--stop-after', default = 6, type=int)
     parser.add_argument("--loss-ce", default = 1.0, type=float)
 
 

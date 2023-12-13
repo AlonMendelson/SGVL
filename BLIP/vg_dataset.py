@@ -200,11 +200,11 @@ def apply_negative_relation_desc(rand_rel, relations_annotations):
 
 class VgDatasetText(Dataset):
     def __init__(self, vg_path, transforms, num_objects, vg_loss_lambda, negatives = False, relations = 0):
-        f = open(os.path.join("Data","train.json"))
+        f = open(os.path.join("../Data","train.json"))
         self.data = json.load(f)
-        f = open(os.path.join("Data","relations_annotations.json"))
+        f = open(os.path.join("../Data","relations_annotations.json"))
         self.relations_annotations = json.load(f)
-        f = open(os.path.join("Data","attributes_annotations.json"))
+        f = open(os.path.join("../Data","attributes_annotations.json"))
         self.attributes_annotations = json.load(f)
         self.vg_path = vg_path
         self.clip_image_size = 224
@@ -234,7 +234,6 @@ class VgDatasetText(Dataset):
         folder = url_parts[5]
         filename = url_parts[6]
         image_path = os.path.join(self.vg_path,folder,filename)
-
         image = Image.open(image_path)
         image = image.convert('RGB')
         image = image.crop(crop_dimensions)

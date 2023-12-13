@@ -278,15 +278,9 @@ class BLIP_Retrieval_vg(nn.Module):
                 no_relation_row = self.no_relation_row.to(image.device)
                 random_rows = random_rows.expand(no_relation_rows_to_add,-1).to(image.device)
                 relations_descs_feat_m = torch.cat([relations_descs_feat_m,random_rows,no_relation_row])
-                if not self.unify_heads:
-                    label_embeddings = self.rel_class_head(relation_tokens)
-                else:
-                    label_embeddings = self.class_head(relation_tokens)
+                label_embeddings = self.rel_class_head(relation_tokens)
                 label_predictions = label_embeddings @ relations_descs_feat_m.t() / self.temp 
-                if not self.unify_heads:
-                    bb_predictions = self.rel_bb_head(relation_tokens).sigmoid()
-                else:
-                    bb_predictions = self.bb_head(relation_tokens).sigmoid()
+                bb_predictions = self.rel_bb_head(relation_tokens).sigmoid()
                 predictions_dict = {"pred_logits" : label_predictions, "pred_boxes": bb_predictions}
                 relation_loss_dict = self.vgrelcriterion(predictions_dict, relations_targets)
                 loss_dict = {k: loss_dict[k] + relation_loss_dict[k] for k in loss_dict}
@@ -463,8 +457,6 @@ def blip_retrieval_vg(pretrained='',**kwargs):
     args = kwargs["args"]    
     if pretrained and args.evaluate == "":
         model,msg = load_checkpoint(model,pretrained)
-        print("missing keys:")
-        print(msg.missing_keys)
         with torch.no_grad():
             if args.prompts_lora != -1:
                 for b in model.visual_encoder.blocks:

@@ -83,3 +83,7 @@ mkdir BLIP/pretrained_checkpoints
 wget https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_base.pth -P BLIP/pretrained_checkpoints
 
 
+Run the train code
+```
+bash train.sh
+```
